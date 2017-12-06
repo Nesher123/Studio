@@ -1,10 +1,13 @@
-let rotate = (string) => {
-	console.log(string);
-	
-	for(let i = 0; i < string.length - 1; i++) {
-		string = string.slice(-1) + string.slice(0, -1);
-		console.log(string);
-	}
-}
+let prompts = require("readline").createInterface(process.stdin, process.stdout);
 
-rotate('milab');
+prompts.question('Please enter a word and press Enter: ', userInput => {
+	console.log('Your results:');
+	console.log(userInput);
+	
+	for(let i = 0; i < userInput.length - 1; i++) {
+		userInput = userInput.slice(-1) + userInput.slice(0, -1);
+		console.log(userInput);
+	}
+	
+	process.exit();
+});
