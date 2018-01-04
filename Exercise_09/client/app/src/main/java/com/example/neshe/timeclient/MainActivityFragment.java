@@ -36,8 +36,8 @@ public class MainActivityFragment extends Fragment {
                 progressDialog.setMessage("Fetching time from server...");
                 progressDialog.show();
                 final RequestQueue _queue = Volley.newRequestQueue(getContext());
-                String url = "http://10.0.2.2:5000/getTime";
-                // OR https://thawing-caverns-53468.herokuapp.com/getTime";
+                String url = "https://frozen-atoll-20022.herokuapp.com/getTime";
+                // OR "http://10.0.2.2:5000/getTime"
 
                 StringRequest req = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                     @Override
