@@ -1,0 +1,19 @@
+{
+  "name": "exercise_08",
+  "version": "1.0.0",
+  "description": "stream heroku ex",
+  "main": "index.js",
+  "dependencies": {
+    "alphavantage": "^1.1.0",
+    "cool-ascii-faces": "^1.3.4",
+    "express": "^4.16.2",
+    "replaceall": "^0.1.6",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ofir Nesher",
+  "license": "ISC"
+}
