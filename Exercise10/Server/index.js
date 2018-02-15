@@ -1,3 +1,8 @@
+
+/************
+Shahaf Ben-Yakir & Ofir Nesher - Ex 10
+*************/
+
 // API KEY: BVQ0TBJTX4WPV0H0
 const alphavantage = require('alphavantage')({key: 'BVQ0TBJTX4WPV0H0'});
 const app = require('express')();
@@ -24,31 +29,35 @@ io.on('connect', (socket) => {
 });
 
 let startCyclicPing = () => {
-		// TODO: timer every 15 sec call getDataFromAlphaAdvantage
-		getDataFromAlphaAdvantage();
-}
+	if(!m_socket){
+		console.log('no socket');
+		return;
+	}
+	else if(!m_stockName){
+		socket.emit('cannot find');
+        console.log('No such stock exists');
+        return;
+	}
+	else {
+		setInterval(getDataFromAlphaAdvantage, 15000);
+	}
+};
+
 
 let getDataFromAlphaAdvantage = () => {
-	let parsedData, newTrimdata; 
+	let firstKey, newTrimdata; 
 	alphavantage.data.intraday(m_stockName)
 		.then((data) => {
-			//console.log(data);
-			//let stringData = Buffer.from(data, 'base64').toString('ascii');
-			//fix(stringData);
-			//parsedData = JSON.parse(data);
-			console.log(replaceall("\'", "\"", data['Time Series (1min)']));
-			
-			//parsedData = Object.keys(data['Time Series (1min)']);
-			//newTrimdata = data['Time Series (1min)'][parsedData]["1. open"];
-			//console.log(newTrimdata);
-			//m_socket.emit('stockData', parsedData); // emit an event to the sockets
+			firstKey = Object.keys(data['Time Series (1min)'])[0]; // receive the first key in the object
+			newTrimdata = data['Time Series (1min)'][firstKey]; // retrieve the last updated data
+			console.log(newTrimdata);
+			m_socket.emit('stockData', newTrimdata); // emit an event to the sockets
 			//io.emit('broadcast', 'test'); // emit an event to all connected sockets
 		})
-		
-}
-
-let fix = (string) => {
-	
+		.catch((err) => {
+			console.error(`error getting stock: ${m_stockName} info`);
+			m_socket.emit('stockData', 'error getting stock info, please try again'); // in case this stock does not exist
+		})
 }
 
 server.listen(PORT, () => {

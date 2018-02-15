@@ -1,21 +1,17 @@
 package com.example.neshe.stockapp;
 
 import android.app.ProgressDialog;
+import android.content.SyncStatusObserver;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -32,11 +28,8 @@ public class MainActivityFragment extends Fragment {
 
     String serverUrl = "http://10.0.2.2:5000";
     // OR "https://frozen-atoll-20022.herokuapp.com/stock"
-    private TextView openText;
-    private TextView highText;
-    private TextView lowText;
-    private TextView closeText;
-    private TextView volumeText;
+    private EditText stockName;
+    private TextView stockData;
     private Socket mSocket;
     {
         try
@@ -60,33 +53,31 @@ public class MainActivityFragment extends Fragment {
         mSocket.connect();
     }
 
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        openText = (TextView) view.findViewById(R.id.open_text);
-        highText = (TextView) view.findViewById(R.id.high_text);
-        lowText = (TextView) view.findViewById(R.id.low_text);
-        closeText = (TextView) view.findViewById(R.id.close_text);
-        volumeText = (TextView) view.findViewById(R.id.volume_text);
+        stockName = (EditText) view.findViewById(R.id.StockName);
+        stockData = (TextView) view.findViewById(R.id.text);
 
         Button button = (Button) view.findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
 
-
             @Override
             public void onClick(final View view) {
-                final ProgressDialog progressDialog = new ProgressDialog(view.getContext());
-                // progressDialog.setMessage("Fetching data from server...");
-                // progressDialog.show();
-                mSocket.emit("StockName", "MSFT");
+                if (stockName.getText().length() == 0) {
+                    Toast.makeText(view.getContext(), "You did not enter a valid input", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
+                else {
+                    mSocket.emit("StockName", stockName.getText());
+                }
             }
         });
 
         return view;
     }
-
 
 
     private Emitter.Listener onReceivedAnswer = new Emitter.Listener() {
@@ -95,27 +86,11 @@ public class MainActivityFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    JSONObject data = null;
-                    String open, high, low, close, volume;
                     try {
-                        data = new JSONObject(args[0].toString());
+                        stockData.setText(args[0].toString());
                     } catch (Exception e) {
-
-                    }
-
-
-                    try {
-                        open = data.getString("open");
-                        high = data.getString("high");
-                        low = data.getString("low");
-                        close = data.getString("close");
-                        volume = data.getString("volume");
-                    } catch (JSONException e) {
                         return;
                     }
-
-                    // add the message to view
-                    displayData(open, high, low, close, volume);
                 }
             });
         }
@@ -125,14 +100,5 @@ public class MainActivityFragment extends Fragment {
     private void subscribeToStock () {
         mSocket.on("answer", onReceivedAnswer);
         mSocket.connect();
-        
-    }
-
-    private void displayData (String... args) {
-        openText.setText(args[0]);
-        highText.setText(args[1]);
-        lowText.setText(args[2]);
-        closeText.setText(args[3]);
-        volumeText.setText(args[4]);
     }
 }

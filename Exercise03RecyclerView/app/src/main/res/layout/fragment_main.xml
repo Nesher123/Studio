@@ -10,28 +10,53 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:gravity="center"
         android:orientation="vertical"
-        android:gravity="center">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <Button
             android:id="@+id/button_stark"
-            android:layout_width="136dp"
-            android:layout_height="71dp"
-            android:layout_marginBottom="90sp"
-            android:layout_marginLeft="2sp"
-            android:layout_marginRight="10sp"
-            android:background="@android:color/holo_blue_light"
-            android:text="Stark" />
-
-        <Button
-            android:id="@+id/button_lannister"
-            android:layout_width="136dp"
+            android:layout_width="400dp"
             android:layout_height="71dp"
             android:layout_marginBottom="5sp"
             android:layout_marginLeft="2sp"
             android:layout_marginRight="10sp"
-            android:background="@android:color/holo_orange_dark"
+            android:background="@android:color/holo_orange_light"
+            android:text="Stark" />
+
+        <Button
+            android:id="@+id/button_lannister"
+            android:layout_width="425dp"
+            android:layout_height="71dp"
+            android:layout_marginBottom="5sp"
+            android:layout_marginLeft="2sp"
+            android:layout_marginRight="10sp"
+            android:background="@android:color/holo_orange_light"
             android:text="Lannister" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:layout_marginBottom="5sp"
+
+            android:background="@android:color/holo_orange_light"
+            android:text="Button" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginBottom="5sp"
+
+            android:background="@android:color/holo_orange_light"
+            android:text="Button" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="79dp"
+            android:background="@color/colorPrimary"
+            android:text="About Us" />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
