@@ -3,7 +3,8 @@
 const express = require('express');
 const app = express();
 const MongoClient = require('mongodb').MongoClient;
-const MONGO_URL = 'mongodb://Nesher:1333mlab@ds239217.mlab.com:39217/milab-studio';
+const MONGO_URL = 'mongodb://localhost:5000/mongotest'
+//'mongodb://Nesher:1333mlab@ds239217.mlab.com:39217/milab-studio'; not working properly...
 const bodyParser = require('body-parser');
 const ObjectId = require('mongodb').ObjectId;
 
@@ -28,9 +29,9 @@ MongoClient.connect(MONGO_URL, (err, db) => {
 		});
 		
 		let collection = myDatabase.collection("musicCollection");
-		//db.collection.createIndex({"name": -1})
-		//db.collection.createIndex({"artist": -1})
-		//db.collection.createIndex({"album": -1})
+		db.collection.createIndex({"name": 1})
+		db.collection.createIndex({"artist": 1})
+		db.collection.createIndex({"album": 1})
 	}
 });
 
@@ -41,25 +42,66 @@ CRUD == CREATE(post), READ(get), UPDATE(put), DELETE(delete)
 
 //READ(get)
 app.get('/READ', (req, res) => {
-	
-	collection.find({[req.params.key] : req.params.value}).toArray((err, result) => {
-			if(err){
-				console.log('err while searching in DB');
-				return;
-			}
-			console.log(`Found ${result.length} records that matched the query`);
-			if(!result[0]){
-				res.send("Did not find any data");
-			}
-			
-			res.send(JSON.stringify(result[0]));
-		});
+	if (req.query.name) {
+		readSong(req.query.name, res);
+	} else if (req.query.artist) {
+		readArtist(req.query.artist, res);
+	} else if (req.query.album) {
+		readAlbum(req.query.album, res);
+	} else {
+		res.send("invalid input!");
+	}
 });
 
+const readSong = (name, res) => {
+	collection.findOne({"name": name}, function(err, song) {
+		if(err || !song) {
+			res.send("Cannot find a song named " + name);
+		} else {
+			printSongDetails(song, res);
+			res.end();
+		}
+  });
+};
+
+const readArtist = (artist, res) => {
+	collection.find({artist: artist}).toArray((err, results) => {
+		if(err || !results[0]) {
+			res.send("Cannot find an artist named " + artist);
+		} else {
+			res.send('These are the songs that were found: \n');
+			results.forEach(song => printSongDetails(song, res));
+			res.end();
+		}
+	});
+};
+
+const readAlbum = (album, res) => {
+	collection.find({album: album}).toArray((err, results) => {
+		if(err || !results[0]) {
+			res.send("Cannot find an album named " + album);
+		} else {
+			res.send('These are the songs that were found: \n');
+			results.forEach(song => printSongDetails(song, res));
+			res.end();
+		}
+	});
+};
+
+/* get a song item and print its details into the given result */
+const printSongDetails = (song, result) => {
+	result.send(`
+	ID: ${song._id}\n
+	Name: ${song.name}\n
+	Artist: ${song.artist}\n
+	Album: ${song.album}\n\n
+	`);
+};
+	
 //CREATE(post)
 app.post('/CREATE', (req, res) => {
 	if (!req.body.name || !req.body.artist || !req.body.album) {
-		console.log('Invalid input');
+		console.log('Invalid input!');
 	}
 
 	let song = {
@@ -74,15 +116,13 @@ app.post('/CREATE', (req, res) => {
 			return;
         }
 
-		res.send('Item was added successfully');
+		res.send('song was added successfully');
     });
 });
 
 //UPDATE(put)
 app.put('/UPDATE', (req, res) => {
-	let item = req.body;
-	
-	if (!item){
+	if (!req.body){
 		console.log('The item to be updated is not valid!');
 		return;
 	}
@@ -98,20 +138,20 @@ app.put('/UPDATE', (req, res) => {
 			console.log('Cannot update item');
 			return;
 		}
-
+		//else
 		console.log('Item was successfully updated in the collection.');
 		res.send('item updated');
 	});
 });
 
 //DELETE(delete)
-app.delete('/DELETE', (req, res) => {
-	collection.deleteOne({_id: ObjectId(req.query.id) }, function(err) {
+app.delete('/:id', (req, res) => {
+	collection.deleteOne({_id: ObjectId(req.params.id)}, function(err) {
 		if (err) {
             console.log('This song could not be deleted');
 			return;
 		}
 		//else
-		res.send("${id} was deleted.");
+		res.send("Deleted successfully.");
 	});
 });
